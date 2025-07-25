@@ -313,7 +313,7 @@ This script does the following:
 - `#SBATCH --array=1-10`: Specifies that this is an array job with 10 tasks, each with a different random state.
 - Reads the `random_state.txt` file, which contains a list of random states, and uses the `SLURM_ARRAY_TASK_ID` to select the appropriate random state for each task.
 - Runs the `MLP_pararg.py` script with the selected random state as a command line argument.
-- The output and error files are named `S-%a-res.txt` and `S-%a-err.txt`, where `%a` is the array ID, so each task will have its own output and error files. Note that they will be stored in the `output` directory, so make sure to create this directory before running the script.
+- The output and error files are named `S-%a-res.txt` and `S-%a-err.txt`, where `%a` is the array ID, so each task will have its own output and error files. You can also use `%A` for job ID. Note that they will be stored in the `output` directory, so make sure to create this directory before running the script.
 
 We'll also need to create the [`random_state.txt`](random_state.txt) file, which contains a list of random states, one per line. 
 
@@ -342,6 +342,50 @@ Each job in the array has its own job ID, using the main job ID followed by an u
 ## Workflow management
 
 Sometimes you will want to run a series of jobs that depend on each other, for example, you may want to run a job that processes all the accuracies of the MLP training with different random states. In this case, you can use job dependencies to chain jobs together.
+
+To do this, you can use the `--dependency` option in the `sbatch` command. For example, if you have a job that processes the results of the MLP training and you want it to run only after all the MLP training jobs have completed, you can submit the processing job with a dependency on the MLP training jobs.
+
+Let's first create a Python script that gathers all the results of the MLP training into one file, this is [gather_results.py](gather_results.py). And then a job script called [collect.sh](collect.sh) to run it. We can test everything runs by submitting the job script:
+
+```bash
+sbatch collect.sh
+```
+
+We then write another Python script that summarises the results, this is [summarise_results.py](summarise_results.py). And then a job script called [summarise.sh](summarise.sh) to run it. We can test this works by submitting the job script:
+
+```bash
+sbatch summarise.sh
+```
+
+Waiting for a job to complete before submitting the next one can be tedious, so we can use job dependencies to automate this process. We can do this using the following commands: 
+
+```bash
+(base) [30057355@wolffe 02.Working_on_Wolffe]$ sbatch --begin=now+120 second_script.sh 
+Submitted batch job 18374
+(base) [30057355@wolffe 02.Working_on_Wolffe]$ sbatch -d afterok:18374 collect.sh 
+Submitted batch job 18375
+(base) [30057355@wolffe 02.Working_on_Wolffe]$ sbatch -d afterok:18375 summarise.sh 
+Submitted batch job 18376
+```
+
+The `--begin=now+120` option in the first command specifies that the job should start in 120 seconds, which gives us time to submit the next jobs and setup dependencies before the job runs. 
+
+The `-d afterok:18374` option in the second command specifies that the job should only run after job 18374 has completed successfully. The `afterok` dependency means that the job will only run if the previous job completed without errors. Note that we use the job ID of the first job (18374) to set the dependency for the second job (18375), instead of the array job ID. Slurm will automatically wait for all tasks in the array job to complete before running the dependent job.
+
+Running `squeue -u $USER` will show you the status of all these jobs in the queue. You should see something like this:
+
+```Output
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+      18374_[7-10]       cpu      MLP 30057355 PD       0:00      1 (Resources)
+             18375       cpu  collect 30057355 PD       0:00      1 (Dependency)
+             18376       cpu summaris 30057355 PD       0:00      1 (Dependency)
+           18374_1       cpu      MLP 30057355  R       0:05      1 compute-003
+           18374_2       cpu      MLP 30057355  R       0:05      1 compute-003
+           18374_3       cpu      MLP 30057355  R       0:05      1 compute-002
+           18374_4       cpu      MLP 30057355  R       0:05      1 compute-002
+           18374_5       cpu      MLP 30057355  R       0:05      1 compute-002
+           18374_6       cpu      MLP 30057355  R       0:05      1 compute-002
+```
 
 
 

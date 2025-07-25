@@ -1,8 +1,8 @@
 #! /usr/bin/env bash
 #
-#SBATCH --job-name=MLP
-#SBATCH --output=S-collect-out.txt
-#SBATCH --error=S-collect_err.txt
+#SBATCH --job-name=collect
+#SBATCH --output=output/S-collect-out.txt
+#SBATCH --error=output/S-collect_err.txt
 #
 #SBATCH --ntasks=1
 #SBATCH --time=00:05:00

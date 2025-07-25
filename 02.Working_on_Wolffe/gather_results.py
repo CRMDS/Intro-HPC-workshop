@@ -32,9 +32,9 @@ for filename in result_files:
         print(f"Error processing {filename}: {e}")
 
 # Write to CSV
-with open("results_summary.csv", "w", newline="") as csvfile:
+with open("results_gather.csv", "w", newline="") as csvfile:
     writer = csv.writer(csvfile)
     writer.writerow(["Accuracy", "RandomState"])
     writer.writerows(output_rows)
 
-print(f"Done. {len(output_rows)} entries written to results_summary.csv.")
+print(f"Done. {len(output_rows)} entries written to results_gather.csv.")
