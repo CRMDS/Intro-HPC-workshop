@@ -164,7 +164,7 @@ The columns indicate:
 To see your own jobs, you can use:
 
 ```bash
-squeue -u <username>
+squeue -u $USER
 ```
 
 
@@ -181,22 +181,80 @@ sinteractive -p cpu --time=0:30:00
 ```
 This command requests an interactive session on the `cpu` partition for 30 minutes. You can adjust the partition and time limit as needed. Once the resources are allocated, you will be dropped into a shell on one of the compute nodes, where you can run commands interactively.
 
-We'll run a simple [neural network example](NN1_digits.py). First, load the Python module:
+We'll run a simple [neural network example](MLP.py). First, load the Python module:
 
 ```bash
-module load PyTorch/Python3.10
+module load Python/Python3.10
 ```
-
 Then, run the script:
 
 ```bash
-python NN1_digits.py
+python -u MLP.py
+```
+Note that the `-u` option is used to force the output to be unbuffered, which is useful for interactive sessions. This code should take a few seconds to run, for this case the `-u` flag doesn't make a lot of difference.
+
+Use interactive jobs for testing and debugging your code, for running actual jobs, use the batch mode. 
+
+### Batch jobs
+
+To run jobs in batch mode, you need to create a job script that specifies the resources your job needs and the commands to run. For this example, we'll use the [MLP.py](MLP.py) script we used in the interactive session.
+
+To submit a batch job, create a script file (e.g., [first_script.sh](first_script.sh)) with the following content:
+
+```bash
+#! /usr/bin/env bash
+#
+#SBATCH --job-name=MLP
+#SBATCH --output=res.txt
+#
+#SBATCH --ntasks=1
+#SBATCH --time=05:00
+#SBATCH --partition=cpu
+
+# load the module
+module load Python/Python3.10
+
+# do the submission
+python3 -u MLP.py
+sleep 60
 ```
 
+This script does the following:
+- `#! /usr/bin/env bash`: Specifies the script should be run using the bash shell
+- `#SBATCH --job-name=MLP`: Sets the name of the job to "MLP"
+- `#SBATCH --output=res.txt`: Specifies the file where the output of the job will be written
+- `#SBATCH --ntasks=1`: Requests one task (or process) for the job
+- `#SBATCH --time=05:00`: Sets a time limit of 5 minutes for the job
+- `#SBATCH --partition=cpu`: Specifies that the job should run in the `cpu` partition
+- Load the module for Python 3.10, when jobs are run in batch mode, it is like when you first log in, no modules are loaded by default, so you need to load the modules you need for your job.
+- Runs the Python script `MLP.py`. The `-u` option is used to ensure the output is unbuffered, which is useful for batch jobs. 
+- The `sleep 60` command is included to keep the job running for an additional 60 seconds after the Python script completes, which is used here to show the jobs running the queue.
+
+We can then submit this job script using the `sbatch` command:
+```bash
+sbatch first_script.sh
+```
+You can then check the status of your job using `squeue -u $USER`. 
+
+So you should see something like this:
+
+```Output
+(base) [30057355@wolffe 02.Working_on_Wolffe]$ sbatch first_script.sh 
+Submitted batch job 18330
+(base) [30057355@wolffe 02.Working_on_Wolffe]$ squeue -u $USER
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+             18330       cpu      MLP 30057355  R       0:07      1 compute-003
+```
+
+Once the job is complete, you can check the output in the `res.txt` file. This file will contain the output of the Python script, including any print statements.
 
 
-
-
+In summary, we: 
+1. Created a python script that trains a simple neural network on the digits dataset.
+2. Created a job script that specifies the resources needed and the commands to run.
+3. Submitted the job script using `sbatch`.
+4. Checked the status of the job using `squeue`.
+5. Check the output of the job in the `res.txt` file.
 
 
 ## Parallel jobs

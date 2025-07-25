@@ -12,5 +12,5 @@ module load Python/Python3.10
 
 # do the submission
 python3 -u MLP.py
-sleep 180
+sleep 60
 
