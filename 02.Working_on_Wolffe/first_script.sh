@@ -1,7 +1,8 @@
 #! /usr/bin/env bash
 #
 #SBATCH --job-name=MLP
-#SBATCH --output=res.txt
+#SBATCH --output=S-res.txt
+#SBATCH --error=S-err.txt
 #
 #SBATCH --ntasks=1
 #SBATCH --time=05:00
@@ -10,7 +11,9 @@
 # load the module
 module load Python/Python3.10
 
+# move to work directory
+cd ~/Intro-HPC-workshop/02.Working_on_Wolffe/
+
 # do the submission
 python3 -u MLP.py
 sleep 60
-
