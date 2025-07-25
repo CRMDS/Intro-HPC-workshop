@@ -387,6 +387,59 @@ Running `squeue -u $USER` will show you the status of all these jobs in the queu
            18374_6       cpu      MLP 30057355  R       0:05      1 compute-002
 ```
 
+Or we can watch the jobs move through the queue using the `watch` command:
+
+```Output
+(base) [30057355@wolffe 02.Working_on_Wolffe]$ watch squeue -u $USER
+             JOBID PARTITION     NAME     USER ST	TIME  NODES NODELIST(REASON)
+      18386_[1-10]	 cpu	  MLP 30057355 PD	0:00	  1 (BeginTime)
+             18387	 cpu  collect 30057355 PD	0:00	  1 (Dependency)
+             18388	 cpu summaris 30057355 PD	0:00	  1 (Dependency)
+# MLP job is watiing to begin, others are pending due to dependencies
+
+             JOBID PARTITION     NAME     USER ST	TIME  NODES NODELIST(REASON)
+      18386_[7-10]	 cpu	  MLP 30057355 PD	0:00	  1 (Resources)
+             18387	 cpu  collect 30057355 PD	0:00	  1 (Dependency)
+             18388	 cpu summaris 30057355 PD	0:00	  1 (Dependency)
+           18386_1	 cpu	  MLP 30057355  R       0:18	  1 compute-003
+           18386_2	 cpu	  MLP 30057355  R       0:18	  1 compute-003
+           18386_3	 cpu	  MLP 30057355  R       0:18	  1 compute-002
+           18386_4	 cpu	  MLP 30057355  R       0:18	  1 compute-002
+           18386_5	 cpu	  MLP 30057355  R       0:18	  1 compute-002
+           18386_6	 cpu	  MLP 30057355  R       0:18	  1 compute-002
+# Some of the MLP jobs are running, others are pending due to resources, and the collect and summarise jobs are pending due to dependencies
+
+             JOBID PARTITION     NAME     USER ST	TIME  NODES NODELIST(REASON)
+             18387	 cpu  collect 30057355 PD	0:00	  1 (Dependency)
+             18388	 cpu summaris 30057355 PD	0:00	  1 (Dependency)
+           18386_9	 cpu      MLP 30057355  R       0:03	  1 compute-002
+          18386_10	 cpu	  MLP 30057355  R       0:03	  1 compute-002
+           18386_7	 cpu	  MLP 30057355  R       0:08	  1 compute-003
+           18386_8	 cpu	  MLP 30057355  R       0:08	  1 compute-003
+# All MLP jobs are running, collect and summarise jobs are pending due to dependencies
+
+             JOBID PARTITION     NAME     USER ST	TIME  NODES NODELIST(REASON)
+             18388	 cpu summaris 30057355 PD	0:00	  1 (Dependency)
+             18387	 cpu collect  30057355 R	0:00	  1 compute-003
+# All MLP jobs are finished, collect job is running, summarise job is pending due to dependency
+
+             JOBID PARTITION     NAME     USER ST	TIME  NODES NODELIST(REASON)
+             18388	 cpu summaris 30057355 R	0:00	  1 compute-003
+# collect job is finished, summarise job is running. 
+
+             JOBID PARTITION     NAME     USER ST	TIME  NODES NODELIST(REASON)
+# all jobs are done.             
+```
+
+Once everything is done, you will want to clean up the output files and any temporary files you created. You can do this by creating a script called [cleanup.sh](cleanup.sh) so that you know you're deleting the right files. I leave this as an exercise. 
+
+
+
+
+## Using the GPU 
+
+
+
 
 
 ## Tips and tricks
