@@ -1,4 +1,6 @@
 .DS_Store
 
 # Generated files
-02.Working_on_Wolffe/res.txt
+02.Working_on_Wolffe/res*.txt
+02.Working_on_Wolffe/S-*.txt
+02.Working_on_Wolffe/output/*

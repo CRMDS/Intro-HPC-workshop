@@ -205,7 +205,8 @@ To submit a batch job, create a script file (e.g., [first_script.sh](first_scrip
 #! /usr/bin/env bash
 #
 #SBATCH --job-name=MLP
-#SBATCH --output=res.txt
+#SBATCH --output=S-res.txt
+#SBATCH --error=S-err.txt
 #
 #SBATCH --ntasks=1
 #SBATCH --time=05:00
@@ -213,6 +214,9 @@ To submit a batch job, create a script file (e.g., [first_script.sh](first_scrip
 
 # load the module
 module load Python/Python3.10
+
+# move to work directory
+cd ~/Intro-HPC-workshop/02.Working_on_Wolffe/
 
 # do the submission
 python3 -u MLP.py
@@ -222,11 +226,13 @@ sleep 60
 This script does the following:
 - `#! /usr/bin/env bash`: Specifies the script should be run using the bash shell
 - `#SBATCH --job-name=MLP`: Sets the name of the job to "MLP"
-- `#SBATCH --output=res.txt`: Specifies the file where the output of the job will be written
+- `#SBATCH --output=S-res.txt`: Specifies the file where the output of the job will be written
+- `#SBATCH --error=S-err.txt`: Specifies the file where any error messages will be written
 - `#SBATCH --ntasks=1`: Requests one task (or process) for the job
 - `#SBATCH --time=05:00`: Sets a time limit of 5 minutes for the job
 - `#SBATCH --partition=cpu`: Specifies that the job should run in the `cpu` partition
 - Load the module for Python 3.10, when jobs are run in batch mode, it is like when you first log in, no modules are loaded by default, so you need to load the modules you need for your job.
+- `cd ~/Intro-HPC-workshop/02.Working_on_Wolffe/`: Changes the working directory to where the script is located.
 - Runs the Python script `MLP.py`. The `-u` option is used to ensure the output is unbuffered, which is useful for batch jobs. 
 - The `sleep 60` command is included to keep the job running for an additional 60 seconds after the Python script completes, which is used here to show the jobs running the queue.
 
@@ -257,11 +263,65 @@ In summary, we:
 5. Check the output of the job in the `res.txt` file.
 
 
-## Parallel jobs
+## Parallel jobs and workflow management
 
+### Parallel jobs
 
+The power of the HPC comes from the ability to run jobs with multiple tasks or processes. For example, when training a machine learning model, you will want to run multiple training jobs with different hyperparameters to find the best model. You can do it in a single script using `for` loops, but this can be inefficient and hard to manage. Instead, you should have run training tasks as separate jobs, each with its own set of resources. This is where the power of HPC systems comes into play, as they can run many jobs in parallel, significantly speeding up computations. 
 
+We will modify the previous python script to accept command line arguments for the random state, and then submit multiple jobs with different random states. To do this, we will create a new script called [MLP_pararg.py](MLP_pararg.py) that accepts a random state as a command line argument. 
 
+Test the script by running it with command line input of random states in interactive mode (or in batch mode if you prefer):
+
+```bash
+python MLP_pararg.py --random_state 42
+```
+This should run the script and print the test accuracy, and also output the results to a file named `res_42.txt`.
+
+Next, we will create a job script that submits multiple jobs with different random states. Create a new script called [second_script.sh](second_script.sh) with the following content:
+
+```bash
+#! /usr/bin/env bash
+#
+#SBATCH --job-name=MLP
+#SBATCH --output=output/S-%A-res.txt
+#SBATCH --error=output/S-%A-err.txt
+#
+#SBATCH --ntasks=1
+#SBATCH --time=05:00
+#SBATCH --partition=cpu
+#SBATCH --array=1-10   # Array job with 10 tasks
+
+# load the module
+module load Python/Python3.10
+
+# move to work directory
+cd ~/Intro-HPC-workshop/02.Working_on_Wolffe/
+
+data_file='random_state.txt'
+# read the i-th line from the file and store it as "n"
+n=$(sed -n "${SLURM_ARRAY_TASK_ID}p" $data_file)
+
+echo "Running task ${SLURM_ARRAY_TASK_ID} with random state ${n}"
+
+# do the submission
+python3 -u MLP_pararg.py --random_state $n
+sleep 60
+```
+
+This script does the following:
+- `#SBATCH --array=1-10`: Specifies that this is an array job with 10 tasks, each with a different random state.
+- Reads the `random_state.txt` file, which contains a list of random states, and uses the `SLURM_ARRAY_TASK_ID` to select the appropriate random state for each task.
+- Runs the `MLP_pararg.py` script with the selected random state as a command line argument.
+- The output and error files are named `S-%A-res.txt` and `S-%A-err.txt`, where `%A` is the job ID, so each task will have its own output and error files. Note that they will be stored in the `output` directory, so make sure to create this directory before running the script.
+
+We'll also need to create the [`random_state.txt`](random_state.txt) file, which contains a list of random states, one per line. 
+
+You can then submit this job script using the `sbatch` command:
+
+```bash
+sbatch second_script.sh
+```
 
 
 
@@ -269,20 +329,18 @@ In summary, we:
 
 To make the most of the HPC resources: 
 
-- resource requests: Always ask for just enough resources for your job. Over-requesting can lead to longer wait times in the queue.
-- job dependencies: Use job dependencies to chain jobs together, ensuring that one job starts only after another has completed. This can be done using the `--dependency` option in the `sbatch` command.
-- job arrays: If you have many similar jobs to run, consider using job arrays. This allows you to submit multiple jobs with a single command, which can save time and reduce the load on the scheduler.
-- monitoring: Use commands like `squeue`, `sinfo`, and `sacct` to monitor your jobs and the state of the cluster. This can help you identify issues and optimize your job submissions.
-- error handling: Always check the output and error files generated by your jobs. These files can provide valuable information about the success or failure of your job and help you debug any issues that arise.
-- documentation: Familiarize yourself with the documentation for Wolffe and Slurm. The [Wolffe Wiki](https://wiki.cdms.westernsydney.edu.au/index.php?title=HPC_documentation) is a great resource for understanding how to use the cluster effectively.
-- **Always check the message of the day**: When you log in, read the message of the day for important announcements or changes to the system.
-- **Use the `module` command**: Always check which modules are loaded and available. This can help you avoid conflicts and ensure you have the right software for your job.
-- **Keep your home directory organized**: HPC systems often have limited storage, so keep your home directory tidy and remove unnecessary files regularly.
-- **Use version control**: If you're working on code, consider using version control systems like Git to keep track of changes and collaborate with others.
-- **Backup important data**: Regularly back up important data to avoid loss in case of hardware failure or other issues.
-- **Be mindful of resource usage**: Avoid running resource-intensive jobs on the login node, as this can disrupt other users. Always use `sinteractive` or `sbatch` to run jobs on compute nodes.
-- **Use the `scontrol` command**: This command can be used to view and modify job properties, such as changing the priority of a job or canceling a job.
-- **Learn about job scheduling**: Understanding how the scheduler works can help you optimize your job submissions and reduce wait times in the queue.
-- **Use `sacct` for job accounting**: This command can be used to view the status and resource usage of completed jobs, which can help you analyze performance and optimize future jobs.
-- **Check the cluster status**: Use `sinfo` to check the status of the cluster and see which nodes are available. This can help you choose the best time to submit your jobs.
+- *Resource requests*: Always ask for just enough resources for your job. Over-requesting can lead to longer wait times in the queue.
+- *Job dependencies*: Use job dependencies to chain jobs together, ensuring that one job starts only after another has completed. This can be done using the `--dependency` option in the `sbatch` command.
+- *Job arrays*: If you have many similar jobs to run, consider using job arrays. This allows you to submit multiple jobs with a single command, which can save time and reduce the load on the scheduler.
+- *Monitoring*: Use commands like `squeue`, `sinfo`, and `sacct` to monitor your jobs and the state of the cluster. This can help you identify issues and optimize your job submissions.
+- *Error handling*: Always check the output and error files generated by your jobs. These files can provide valuable information about the success or failure of your job and help you debug any issues that arise.
+- *Always read the message of the day*: When you log in, read the message of the day for important announcements or changes to the system.
+- *Use the `module` command*: Always check which modules are loaded and available. This can help you avoid conflicts and ensure you have the right software for your job.
+- *Keep your home directory organized*: HPC systems often have limited storage, so keep your home directory tidy and remove unnecessary files regularly.
+- *Use version control*: If you're working on code, consider using version control systems like Git to keep track of changes and collaborate with others.
+- *Backup important data*: Regularly back up important data to avoid loss in case of hardware failure or other issues. The HPC system is not a place for long-term data storage, so consider using external storage solutions for important files.
+- *Be mindful of resource usage*: Avoid running resource-intensive jobs on the login node, as this can disrupt other users. Always use `sinteractive` or `sbatch` to run jobs on compute nodes.
+- *Learn about job scheduling*: Understanding how the scheduler works can help you optimize your job submissions and reduce wait times in the queue.
+- *Use `sacct` for job accounting*: This command can be used to view the status and resource usage of completed jobs, which can help you analyze performance and optimize future jobs.
+- *Check the cluster status*: Use `sinfo` to check the status of the cluster and see which nodes are available. This can help you choose the best time to submit your jobs.
 

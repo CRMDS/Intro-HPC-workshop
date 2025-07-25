@@ -1,8 +1,8 @@
 #! /usr/bin/env bash
 #
 #SBATCH --job-name=MLP
-#SBATCH --output=S-%A-res.txt
-#SBATCH --error=S-%A-err.txt
+#SBATCH --output=output/S-%A-res.txt
+#SBATCH --error=output/S-%A-err.txt
 #
 #SBATCH --ntasks=1
 #SBATCH --time=05:00
