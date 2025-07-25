@@ -209,7 +209,7 @@ To submit a batch job, create a script file (e.g., [first_script.sh](first_scrip
 #SBATCH --error=S-err.txt
 #
 #SBATCH --ntasks=1
-#SBATCH --time=05:00
+#SBATCH --time=00:05:00
 #SBATCH --partition=cpu
 
 # load the module
@@ -288,7 +288,7 @@ Next, we will create a job script that submits multiple jobs with different rand
 #SBATCH --error=output/S-%A-err.txt
 #
 #SBATCH --ntasks=1
-#SBATCH --time=05:00
+#SBATCH --time=00:05:00
 #SBATCH --partition=cpu
 #SBATCH --array=1-10   # Array job with 10 tasks
 
@@ -322,6 +322,10 @@ You can then submit this job script using the `sbatch` command:
 ```bash
 sbatch second_script.sh
 ```
+
+You can check the status of your jobs using `squeue -u $USER`, and you should see something like this:
+
+```Output
 
 
 

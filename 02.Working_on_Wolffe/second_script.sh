@@ -5,7 +5,7 @@
 #SBATCH --error=output/S-%A-err.txt
 #
 #SBATCH --ntasks=1
-#SBATCH --time=05:00
+#SBATCH --time=00:05:00
 #SBATCH --partition=cpu
 #SBATCH --array=1-10   # Array job with 10 tasks
 
