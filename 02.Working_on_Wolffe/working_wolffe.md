@@ -284,8 +284,8 @@ Next, we will create a job script that submits multiple jobs with different rand
 #! /usr/bin/env bash
 #
 #SBATCH --job-name=MLP
-#SBATCH --output=output/S-%A-res.txt
-#SBATCH --error=output/S-%A-err.txt
+#SBATCH --output=output/S-%a-res.txt
+#SBATCH --error=output/S-%a-err.txt
 #
 #SBATCH --ntasks=1
 #SBATCH --time=00:05:00
@@ -313,7 +313,7 @@ This script does the following:
 - `#SBATCH --array=1-10`: Specifies that this is an array job with 10 tasks, each with a different random state.
 - Reads the `random_state.txt` file, which contains a list of random states, and uses the `SLURM_ARRAY_TASK_ID` to select the appropriate random state for each task.
 - Runs the `MLP_pararg.py` script with the selected random state as a command line argument.
-- The output and error files are named `S-%A-res.txt` and `S-%A-err.txt`, where `%A` is the job ID, so each task will have its own output and error files. Note that they will be stored in the `output` directory, so make sure to create this directory before running the script.
+- The output and error files are named `S-%a-res.txt` and `S-%a-err.txt`, where `%a` is the array ID, so each task will have its own output and error files. Note that they will be stored in the `output` directory, so make sure to create this directory before running the script.
 
 We'll also need to create the [`random_state.txt`](random_state.txt) file, which contains a list of random states, one per line. 
 
@@ -326,6 +326,22 @@ sbatch second_script.sh
 You can check the status of your jobs using `squeue -u $USER`, and you should see something like this:
 
 ```Output
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+      18341_[7-10]       cpu      MLP 30057355 PD       0:00      1 (Resources)
+           18341_1       cpu      MLP 30057355  R       0:50      1 compute-003
+           18341_2       cpu      MLP 30057355  R       0:50      1 compute-003
+           18341_3       cpu      MLP 30057355  R       0:50      1 compute-002
+           18341_4       cpu      MLP 30057355  R       0:50      1 compute-002
+           18341_5       cpu      MLP 30057355  R       0:50      1 compute-002
+           18341_6       cpu      MLP 30057355  R       0:50      1 compute-002
+```
+
+Each job in the array has its own job ID, using the main job ID followed by an underscore and the task number (e.g., `18341_1`, `18341_2`, etc.). The jobs will run in parallel, and you can check the output files in the `output` directory to see the results of each job. Any job that is still pending will have a status of `PD` (pending), and they are groups into a single job ID with the task numbers in square brackets (e.g., `18341_[7-10]`).
+
+
+## Workflow management
+
+Sometimes you will want to run a series of jobs that depend on each other, for example, you may want to run a job that processes all the accuracies of the MLP training with different random states. In this case, you can use job dependencies to chain jobs together.
 
 
 
