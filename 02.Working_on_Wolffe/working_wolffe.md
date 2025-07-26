@@ -236,6 +236,8 @@ This script does the following:
 - Runs the Python script `MLP.py`. The `-u` option is used to ensure the output is unbuffered, which is useful for batch jobs. 
 - The `sleep 60` command is included to keep the job running for an additional 60 seconds after the Python script completes, which is used here to show the jobs running the queue.
 
+[A note about resource requests](Note_resource.md). 
+
 We can then submit this job script using the `sbatch` command:
 ```bash
 sbatch first_script.sh
@@ -438,8 +440,39 @@ Once everything is done, you will want to clean up the output files and any temp
 
 Other than the ability to run massive parallel jobs, HPC systems also give you access to powerful GPUs. Wolffe currently has NVIDIA A100 and A30 GPUs available for use. To use the GPU, you need to specify the GPU partition when submitting your job.
 
+To use the GPU, you'll first need a Pyhon (or other) script that uses the GPU. For this example, we'll use the [NN_gpu.py](NN_gpu.py) that trains a neural network on the `digits` dataset using the GPU. This script uses the PyTorch library, which is a popular deep learning framework that can take advantage of GPUs for training models.
 
+We now use a [new script](gpu_script.sh) to run the `NN_gpu.py` script on the GPU. The script is similar to the previous job scripts, but it specifies the GPU partition and requests a GPU:
 
+```bash
+#! /usr/bin/env bash
+#
+#SBATCH --job-name=NN_gpu
+#SBATCH --output=output/S-gpu-out.txt
+#SBATCH --error=output/S-gpu-err.txt
+#
+#SBATCH --time=00:05:00
+#SBATCH --partition=ampere80
+#SBATCH --gres=gpu:1
+#SBATCH --cpus-per-task=1
+
+# load the module
+module load PyTorch/Python3.10
+
+# move to work directory
+cd ~/Intro-HPC-workshop/02.Working_on_Wolffe/
+
+# do the submission
+python3 -u NN_gpu.py
+sleep 60
+```
+
+This script does the following:
+- `#SBATCH --partition=ampere80`: Specifies that the job should run in the `ampere80` partition, which is the partition for A100 GPUs and 80Gb RAM.
+- `#SBATCH --gres=gpu:1`: Requests one GPU for the job. The `gres` option stands for "generic resources" and is used to request GPUs.
+- `#SBATCH --cpus-per-task=1`: Requests one CPU core for the job. This is important because the GPU will handle the heavy lifting, but you still need a CPU to manage the job and run the Python script. Also, for large GPU jobs, you can speed up the job by requesting more CPU cores, for example, to load data into the GPU faster.
+- We load the PyTorch module, which is already configured to use the GPU available.
+- The rest of the script is similar to the previous scripts. 
 
 
 ## Tips and tricks
