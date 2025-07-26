@@ -480,6 +480,7 @@ This script does the following:
 To make the most of the HPC resources: 
 
 - *Resource requests*: Always ask for just enough resources for your job. Over-requesting can lead to longer wait times in the queue.
+- *Parallised jobs*: If your job can be parallelised, use multiple tasks or processes to take advantage of the available resources. This can significantly speed up your computations and wait time on the queue.
 - *Job dependencies*: Use job dependencies to chain jobs together, ensuring that one job starts only after another has completed. This can be done using the `--dependency` option in the `sbatch` command.
 - *Job arrays*: If you have many similar jobs to run, consider using job arrays. This allows you to submit multiple jobs with a single command, which can save time and reduce the load on the scheduler.
 - *Monitoring*: Use commands like `squeue`, `sinfo`, and `sacct` to monitor your jobs and the state of the cluster. This can help you identify issues and optimize your job submissions.
