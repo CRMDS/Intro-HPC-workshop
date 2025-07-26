@@ -10,7 +10,7 @@ When requesting resources (time, number of cpu, memory, etc.) for your jobs, rem
 
 **Don't over request**: While it might be tempting to request more resources than you think you'll need, this can lead to inefficiencies and longer wait times for your job. Try to estimate your resource needs as accurately as possible. The following image demonstrates the impact of over-requesting resources on job wait times in the queue.
 
-![Queue][Queue.png]
+![Queue](Queue.png)
 
 The job scheduler will prioritise jobs that request fewer resources, it'll also balance the request between users. Just because you submitted a job later than other users, doesn't mean your job will run later. If you request fewer resources than other users, your job may run sooner. Use the parallel computing resources efficiently to ensure that your job runs in a timely manner -- 100 jobs requesting 10 min each will run much faster and sooner than one job requesting 1000 min (17 hr).
 
