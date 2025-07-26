@@ -6,6 +6,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
 
+# Use GPU if available
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")   
+print(f"Using device: {device}")
+
 # 1. Load and prepare data
 digits = load_digits()
 X = digits.data  # shape: (1797, 64)
@@ -16,11 +20,11 @@ X = scaler.fit_transform(X)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Convert to PyTorch tensors
-X_train = torch.tensor(X_train, dtype=torch.float32)
-X_test  = torch.tensor(X_test, dtype=torch.float32)
-y_train = torch.tensor(y_train, dtype=torch.long)
-y_test  = torch.tensor(y_test, dtype=torch.long)
+# Convert to PyTorch tensors and move to device
+X_train = torch.tensor(X_train, dtype=torch.float32).to(device)
+X_test  = torch.tensor(X_test, dtype=torch.float32).to(device)
+y_train = torch.tensor(y_train, dtype=torch.long).to(device)
+y_test  = torch.tensor(y_test, dtype=torch.long).to(device)
 
 # 2. Define a simple neural network
 class SimpleNN(nn.Module):
@@ -35,7 +39,7 @@ class SimpleNN(nn.Module):
     def forward(self, x):
         return self.layers(x)
 
-model = SimpleNN()
+model = SimpleNN().to(device)  # Move model to device
 
 # 3. Train the model
 criterion = nn.CrossEntropyLoss()
@@ -55,5 +59,5 @@ for epoch in range(epochs):
 model.eval()
 with torch.no_grad():
     predictions = model(X_test).argmax(dim=1)
-    acc = accuracy_score(y_test, predictions)
+    acc = accuracy_score(y_test.cpu(), predictions.cpu())
     print(f"Test Accuracy: {acc:.2%}")

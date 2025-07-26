@@ -1,6 +1,6 @@
-## Working on Wolffe
+# Working on Wolffe
 
-Wolffe is the name of the HPC cluster at WSU. The wiki page for Wolffe is available at [Wolffe Wiki](https://wiki.cdms.westernsydney.edu.au/index.php?title=HPC_documentation#Conda_environment).
+Wolffe is the name of the HPC cluster at WSU, the wiki page for Wolffe is available [here](https://wiki.cdms.westernsydney.edu.au/index.php?title=HPC_documentation).
 
 ## Logging in
 
@@ -339,19 +339,19 @@ You can check the status of your jobs using `squeue -u $USER`, and you should se
 Each job in the array has its own job ID, using the main job ID followed by an underscore and the task number (e.g., `18341_1`, `18341_2`, etc.). The jobs will run in parallel, and you can check the output files in the `output` directory to see the results of each job. Any job that is still pending will have a status of `PD` (pending), and they are groups into a single job ID with the task numbers in square brackets (e.g., `18341_[7-10]`).
 
 
-## Workflow management
+### Workflow management
 
 Sometimes you will want to run a series of jobs that depend on each other, for example, you may want to run a job that processes all the accuracies of the MLP training with different random states. In this case, you can use job dependencies to chain jobs together.
 
 To do this, you can use the `--dependency` option in the `sbatch` command. For example, if you have a job that processes the results of the MLP training and you want it to run only after all the MLP training jobs have completed, you can submit the processing job with a dependency on the MLP training jobs.
 
-Let's first create a Python script that gathers all the results of the MLP training into one file, this is [gather_results.py](gather_results.py). And then a job script called [collect.sh](collect.sh) to run it. We can test everything runs by submitting the job script:
+Let's first create a [Python script](gather_results.py) that gathers all the results of the MLP training into one file, and a [job script](collect.sh) to run it. We can test everything runs by submitting the job script:
 
 ```bash
 sbatch collect.sh
 ```
 
-We then write another Python script that summarises the results, this is [summarise_results.py](summarise_results.py). And then a job script called [summarise.sh](summarise.sh) to run it. We can test this works by submitting the job script:
+We then write another [Python script](summarise_results.py) that summarises the results, and a [job script](summarise.sh) to run it. We can test this works by submitting the job script:
 
 ```bash
 sbatch summarise.sh
@@ -434,9 +434,9 @@ Or we can watch the jobs move through the queue using the `watch` command:
 Once everything is done, you will want to clean up the output files and any temporary files you created. You can do this by creating a script called [cleanup.sh](cleanup.sh) so that you know you're deleting the right files. I leave this as an exercise. 
 
 
-
-
 ## Using the GPU 
+
+Other than the ability to run massive parallel jobs, HPC systems also give you access to powerful GPUs. Wolffe currently has NVIDIA A100 and A30 GPUs available for use. To use the GPU, you need to specify the GPU partition when submitting your job.
 
 
 
