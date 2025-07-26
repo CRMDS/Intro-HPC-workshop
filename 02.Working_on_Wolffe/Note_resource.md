@@ -12,5 +12,7 @@ When requesting resources (time, number of cpu, memory, etc.) for your jobs, rem
 
 ![Queue](Queue.png)
 
-The job scheduler will prioritise jobs that request fewer resources, it'll also balance the request between users. Just because you submitted a job later than other users, doesn't mean your job will run later. If you request fewer resources than other users, your job may run sooner. Use the parallel computing resources efficiently to ensure that your job runs in a timely manner -- 100 jobs requesting 10 min each will run much faster and sooner than one job requesting 1000 min (17 hr).
+Here, the jobs that requested 5 hours of time have been running for over 1 hour, while those that requested 1 day are still waiting, even the some of the 24 hr jobs were in the queue earlier. This is because the job scheduler prioritises jobs that request fewer resources, allowing them to run sooner.
+
+The job scheduler also balances the request between users. Just because you submitted a job later than other users, doesn't mean your job will run later. If you request fewer resources than other users, your job may run sooner. Use the parallel computing resources efficiently to ensure that your job runs in a timely manner -- 100 jobs requesting 10 min each will run much faster and sooner than one job requesting 1000 min (17 hr).
 
