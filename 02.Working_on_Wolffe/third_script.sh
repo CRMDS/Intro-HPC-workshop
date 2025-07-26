@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 #
-#SBATCH --job-name=MLP
+#SBATCH --job-name=NN_gpu
 #SBATCH --output=output/S-gpu-out.txt
 #SBATCH --error=output/S-gpu-err.txt
 #
@@ -10,7 +10,7 @@
 #SBATCH --cpus-per-task=1
 
 # load the module
-module load Pytouch/Python3.10
+module load PyTorch/Python3.10
 
 # move to work directory
 cd ~/Intro-HPC-workshop/02.Working_on_Wolffe/
