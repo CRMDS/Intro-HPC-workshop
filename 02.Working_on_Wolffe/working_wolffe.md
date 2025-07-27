@@ -269,7 +269,7 @@ In summary, we:
 
 ### Parallel jobs
 
-The power of the HPC comes from the ability to run jobs with multiple tasks or processes. For example, when training a machine learning model, you will want to run multiple training jobs with different hyperparameters to find the best model. You can do it in a single script using `for` loops, but this can be inefficient and hard to manage. Instead, you should have run training tasks as separate jobs, each with its own set of resources. This is where the power of HPC systems comes into play, as they can run many jobs in parallel, significantly speeding up computations. 
+The power of the HPC comes from the ability to run jobs with multiple tasks or processes. For example, when training a machine learning model, you will want to run multiple training jobs with different hyperparameters to find the best model. You can do it in a single script using `for` loops, but this can be inefficient and hard to manage. Instead, you should run training tasks as separate jobs, each with its own set of resources. This is where the power of HPC systems comes into play, as they can run many jobs in parallel, significantly speeding up computations. 
 
 We will modify the previous python script to accept command line arguments for the random state, and then submit multiple jobs with different random states. To do this, we will create a new script called [MLP_pararg.py](MLP_pararg.py) that accepts a random state as a command line argument. 
 
@@ -433,7 +433,7 @@ Or we can watch the jobs move through the queue using the `watch` command:
 # all jobs are done.             
 ```
 
-Once everything is done, you will want to clean up the output files and any temporary files you created. You can do this by creating a script called [cleanup.sh](cleanup.sh) so that you know you're deleting the right files. I leave this as an exercise. 
+Once everything is done, you will want to clean up the output files and any temporary files you created. You can do this by creating a script called `cleanup.sh` so that you know you're deleting the right files. I leave this as an exercise. 
 
 
 ## Using the GPU 
@@ -493,5 +493,5 @@ To make the most of the HPC resources:
 - *Be mindful of resource usage*: Avoid running resource-intensive jobs on the login node, as this can disrupt other users. Always use `sinteractive` or `sbatch` to run jobs on compute nodes.
 - *Learn about job scheduling*: Understanding how the scheduler works can help you optimize your job submissions and reduce wait times in the queue.
 - *Use `sacct` for job accounting*: This command can be used to view the status and resource usage of completed jobs, which can help you analyze performance and optimize future jobs.
-- *Check the cluster status*: Use `sinfo` to check the status of the cluster and see which nodes are available. This can help you choose the best time to submit your jobs.
+- *Save checkpoints*: If your job is long-running, consider saving checkpoints periodically. This way, if the job fails or is interrupted, you can resume from the last checkpoint instead of starting over. Further, some HPC systems have a maximum job time limit (e.g. 7 days on Wolffe GPU, on NCI it's 2 days), so saving checkpoints can help you avoid losing progress if your job exceeds the time limit.
 
