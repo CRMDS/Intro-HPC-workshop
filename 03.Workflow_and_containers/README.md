@@ -99,7 +99,7 @@ Nextflow is a workflow management system designed for data-intensive computation
 ### Real-World Example Scenarios
 - **Genomics Pipeline**: Quality control → Alignment → Variant calling → Annotation
 - **Image Processing**: Raw data → Preprocessing → Analysis → Visualisation
-- **Climate Modeling**: Data ingestion → Model runs → Post-processing → Visualisation
+- **Climate Modelling**: Data ingestion → Model runs → Post-processing → Visualisation
  - **Machine Learning Pipeline**: Data ingestion → Feature engineering → Model training → Hyperparameter tuning → Model evaluation → Deployment
 
 ### Integration with HPC Systems
@@ -141,12 +141,16 @@ Workflows automatically:
 ## Questions and Next Steps
 
 **Resources for Continued Learning:**
-- [Nextflow Training](nextflow.io/training) 
-- [Apptainer Documentation](apptainer.org/docs)
-- [nf-core Community](nf-co.re)
+- [Nextflow Training](https://training.nextflow.io/latest/) 
+- [Apptainer Documentation](https://apptainer.org/documentation/)
+- [nf-core Community](https://nf-co.re)
 - Your Academic Supervisor!
 
 **Hands-on Opportunities:**
-- Many HPC centers offer container and workflow training, for example, [NCI](https://opus.nci.org.au/spaces/Help/pages/48497461/NCI+Training+and+Educational+Events)
+- Many HPC centres offer container and workflow training, for example, [NCI](https://opus.nci.org.au/spaces/Help/pages/48497461/NCI+Training+and+Educational+Events)
 - Online tutorials and workshops
 - Start with your current research workflows and containerise them incrementally
+
+**Advanced Workshop Topics:**
+- Working on NCI
+- Nextflow in action. 
