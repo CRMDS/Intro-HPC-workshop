@@ -5,8 +5,7 @@
 #SBATCH --error=output/S-gpu-err.txt
 #
 #SBATCH --time=00:05:00
-#SBATCH --partition=ampere80
-#SBATCH --gres=gpu:1
+#SBATCH --partition=ampere24
 #SBATCH --cpus-per-task=1
 
 # load the module
