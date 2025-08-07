@@ -461,7 +461,6 @@ We now use a [new script](gpu_script.sh) to run the `NN_gpu.py` script on the GP
 #
 #SBATCH --time=00:05:00
 #SBATCH --partition=ampere80
-#SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=1
 
 # load the module
@@ -477,11 +476,11 @@ sleep 60
 
 This script does the following:
 - `#SBATCH --partition=ampere80`: Specifies that the job should run in the `ampere80` partition, which is the partition for A100 GPUs and 80Gb RAM.
-- `#SBATCH --gres=gpu:1`: Requests one GPU for the job. The `gres` option stands for "generic resources" and is used to request GPUs.
 - `#SBATCH --cpus-per-task=1`: Requests one CPU core for the job. This is important because the GPU will handle the heavy lifting, but you still need a CPU to manage the job and run the Python script. Also, for large GPU jobs, you can speed up the job by requesting more CPU cores, for example, to load data into the GPU faster.
 - We load the PyTorch module, which is already configured to use the GPU available.
 - The rest of the script is similar to the previous scripts. 
 
+Note that in other HPC systems, you may need to use `#SBATCH --gres=gpu:1` (`gres` for "generic resources") to request a GPU, but on Wolffe, the `--partition=ampere80` option is sufficient to request a GPU.
 
 ## Tips and tricks
 
