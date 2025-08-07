@@ -189,7 +189,7 @@ module load Python/Python3.10
 Then, run the script:
 
 ```bash
-python -u MLP.py
+python3 -u MLP.py
 ```
 Note that the `-u` option is used to force the output to be unbuffered, which is useful for interactive sessions. This code should take a few seconds to run, for this case the `-u` flag doesn't make a lot of difference.
 
@@ -254,7 +254,15 @@ Submitted batch job 18330
              18330       cpu      MLP 30057355  R       0:07      1 compute-003
 ```
 
-Once the job is complete, you can check the output in the `res.txt` file. This file will contain the output of the Python script, including any print statements.
+Once the job is complete, you can check the output in the `S-res.txt` file. This file will contain the output of the Python script, including any print statements. You can also check any error outputs in the `S-err.txt` file.
+
+Other useful information: 
+* You can delete the job on the queue using the `scancel` command. 
+* When your jobs have finished, you can check for the resource usage using the `sacct` command. 
+* You can customise the outputs of `squeue` and `sacct` using the `--format` option. 
+
+We leave these items as exercises for you to try out.
+
 
 
 In summary, we: 
@@ -262,14 +270,14 @@ In summary, we:
 2. Created a job script that specifies the resources needed and the commands to run.
 3. Submitted the job script using `sbatch`.
 4. Checked the status of the job using `squeue`.
-5. Check the output of the job in the `res.txt` file.
+5. Check the output and the error of the job in the `S-res.txt` and `S-err.txt` files.
 
 
 ## Parallel jobs and workflow management
 
 ### Parallel jobs
 
-The power of the HPC comes from the ability to run jobs with multiple tasks or processes. For example, when training a machine learning model, you will want to run multiple training jobs with different hyperparameters to find the best model. You can do it in a single script using `for` loops, but this can be inefficient and hard to manage. Instead, you should have run training tasks as separate jobs, each with its own set of resources. This is where the power of HPC systems comes into play, as they can run many jobs in parallel, significantly speeding up computations. 
+The power of the HPC comes from the ability to run jobs with multiple tasks or processes. For example, when training a machine learning model, you will want to run multiple training jobs with different hyperparameters to find the best model. You can do it in a single script using `for` loops, but this can be inefficient and hard to manage. Instead, you should run training tasks as separate jobs, each with its own set of resources. This is where the power of HPC systems comes into play, as they can run many jobs in parallel, significantly speeding up computations. 
 
 We will modify the previous python script to accept command line arguments for the random state, and then submit multiple jobs with different random states. To do this, we will create a new script called [MLP_pararg.py](MLP_pararg.py) that accepts a random state as a command line argument. 
 
@@ -433,14 +441,14 @@ Or we can watch the jobs move through the queue using the `watch` command:
 # all jobs are done.             
 ```
 
-Once everything is done, you will want to clean up the output files and any temporary files you created. You can do this by creating a script called [cleanup.sh](cleanup.sh) so that you know you're deleting the right files. I leave this as an exercise. 
+Once everything is done, you will want to clean up the output files and any temporary files you created. You can do this by creating a script called `cleanup.sh` so that you know you're deleting the right files. We leave this as an exercise. 
 
 
 ## Using the GPU 
 
 Other than the ability to run massive parallel jobs, HPC systems also give you access to powerful GPUs. Wolffe currently has NVIDIA A100 and A30 GPUs available for use. To use the GPU, you need to specify the GPU partition when submitting your job.
 
-To use the GPU, you'll first need a Pyhon (or other) script that uses the GPU. For this example, we'll use the [NN_gpu.py](NN_gpu.py) that trains a neural network on the `digits` dataset using the GPU. This script uses the PyTorch library, which is a popular deep learning framework that can take advantage of GPUs for training models.
+To use the GPU, you'll first need a Pyhon (or other) script that uses the GPU. For this example, we'll use [NN_gpu.py](NN_gpu.py) that trains a neural network on the `digits` dataset using the GPU. This script uses the PyTorch library, which is a popular deep learning framework that can take advantage of GPUs for training models.
 
 We now use a [new script](gpu_script.sh) to run the `NN_gpu.py` script on the GPU. The script is similar to the previous job scripts, but it specifies the GPU partition and requests a GPU:
 
@@ -480,17 +488,18 @@ This script does the following:
 To make the most of the HPC resources: 
 
 - *Resource requests*: Always ask for just enough resources for your job. Over-requesting can lead to longer wait times in the queue.
+- *Parallised jobs*: If your job can be parallelised, use multiple tasks or processes to take advantage of the available resources. This can significantly speed up your computations and wait time on the queue.
 - *Job dependencies*: Use job dependencies to chain jobs together, ensuring that one job starts only after another has completed. This can be done using the `--dependency` option in the `sbatch` command.
 - *Job arrays*: If you have many similar jobs to run, consider using job arrays. This allows you to submit multiple jobs with a single command, which can save time and reduce the load on the scheduler.
-- *Monitoring*: Use commands like `squeue`, `sinfo`, and `sacct` to monitor your jobs and the state of the cluster. This can help you identify issues and optimize your job submissions.
+- *Monitoring*: Use commands like `squeue`, `sinfo`, and `sacct` to monitor your jobs and the state of the cluster. This can help you identify issues and optimise your job submissions.
 - *Error handling*: Always check the output and error files generated by your jobs. These files can provide valuable information about the success or failure of your job and help you debug any issues that arise.
 - *Always read the message of the day*: When you log in, read the message of the day for important announcements or changes to the system.
 - *Use the `module` command*: Always check which modules are loaded and available. This can help you avoid conflicts and ensure you have the right software for your job.
-- *Keep your home directory organized*: HPC systems often have limited storage, so keep your home directory tidy and remove unnecessary files regularly.
+- *Keep your home directory organised*: HPC systems often have limited storage, so keep your home directory tidy and remove unnecessary files regularly.
 - *Use version control*: If you're working on code, consider using version control systems like Git to keep track of changes and collaborate with others.
 - *Backup important data*: Regularly back up important data to avoid loss in case of hardware failure or other issues. The HPC system is not a place for long-term data storage, so consider using external storage solutions for important files.
 - *Be mindful of resource usage*: Avoid running resource-intensive jobs on the login node, as this can disrupt other users. Always use `sinteractive` or `sbatch` to run jobs on compute nodes.
-- *Learn about job scheduling*: Understanding how the scheduler works can help you optimize your job submissions and reduce wait times in the queue.
-- *Use `sacct` for job accounting*: This command can be used to view the status and resource usage of completed jobs, which can help you analyze performance and optimize future jobs.
-- *Check the cluster status*: Use `sinfo` to check the status of the cluster and see which nodes are available. This can help you choose the best time to submit your jobs.
+- *Learn about job scheduling*: Understanding how the scheduler works can help you optimise your job submissions and reduce wait times in the queue.
+- *Use `sacct` for job accounting*: This command can be used to view the status and resource usage of completed jobs, which can help you analyze performance and optimise future jobs.
+- *Save checkpoints*: If your job is long-running, consider saving checkpoints periodically. This way, if the job fails or is interrupted, you can resume from the last checkpoint instead of starting over. Further, some HPC systems have a maximum job time limit (e.g. 7 days on Wolffe GPU, on NCI it's 2 days), so saving checkpoints can help you avoid losing progress if your job exceeds the time limit.
 
