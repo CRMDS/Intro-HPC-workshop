@@ -189,7 +189,7 @@ module load Python/Python3.10
 Then, run the script:
 
 ```bash
-python -u MLP.py
+python3 -u MLP.py
 ```
 Note that the `-u` option is used to force the output to be unbuffered, which is useful for interactive sessions. This code should take a few seconds to run, for this case the `-u` flag doesn't make a lot of difference.
 
@@ -254,7 +254,7 @@ Submitted batch job 18330
              18330       cpu      MLP 30057355  R       0:07      1 compute-003
 ```
 
-Once the job is complete, you can check the output in the `res.txt` file. This file will contain the output of the Python script, including any print statements.
+Once the job is complete, you can check the output in the `S-res.txt` file. This file will contain the output of the Python script, including any print statements. You can also check any error outputs in the `S-err.txt` file.
 
 Other useful information: 
 * You can delete the job on the queue using the `scancel` command. 
@@ -270,7 +270,7 @@ In summary, we:
 2. Created a job script that specifies the resources needed and the commands to run.
 3. Submitted the job script using `sbatch`.
 4. Checked the status of the job using `squeue`.
-5. Check the output of the job in the `res.txt` file.
+5. Check the output and the error of the job in the `S-res.txt` and `S-err.txt` files.
 
 
 ## Parallel jobs and workflow management
