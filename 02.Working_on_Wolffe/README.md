@@ -450,7 +450,7 @@ Other than the ability to run massive parallel jobs, HPC systems also give you a
 
 To use the GPU, you'll first need a Pyhon (or other) script that uses the GPU. For this example, we'll use [NN_gpu.py](NN_gpu.py) that trains a neural network on the `digits` dataset using the GPU. This script uses the PyTorch library, which is a popular deep learning framework that can take advantage of GPUs for training models.
 
-We now use a [new script](gpu_script.sh) to run the `NN_gpu.py` script on the GPU. The script is similar to the previous job scripts, but it specifies the GPU partition and requests a GPU:
+We now use a [new script](third_script.sh) to run the `NN_gpu.py` script on the GPU. The script is similar to the previous job scripts, but it specifies the GPU partition and requests a GPU:
 
 ```bash
 #! /usr/bin/env bash
