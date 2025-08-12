@@ -36,9 +36,9 @@ Singularity (now called Apptainer) is the container platform designed specifical
 - Able to convert Docker Containers to Singularity Containers, though can get messy on non-Linux machines (sorry Mac users!)
 
 ### Basic Singularity/Apptainer Concepts
+- **Definition Files**: Recipes for building custom images
 - **Images**: Read-only templates containing your application and environment
 - **Containers**: Running instances of images
-- **Definition Files**: Recipes for building custom images
 
 ### Common Use Cases
 - Running complex software stacks without installation headaches (once the container is set up, that is)

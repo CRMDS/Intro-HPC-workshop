@@ -284,7 +284,7 @@ We will modify the previous python script to accept command line arguments for t
 Test the script by running it with command line input of random states in interactive mode (or in batch mode if you prefer):
 
 ```bash
-python MLP_pararg.py --random_state 42
+python3 MLP_pararg.py --random_state 42
 ```
 This should run the script and print the test accuracy, and also output the results to a file named `res_42.txt`.
 
